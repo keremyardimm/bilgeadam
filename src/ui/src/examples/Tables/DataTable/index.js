@@ -34,6 +34,7 @@ import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDPagination from "components/MDPagination";
+import MDButton from "components/MDButton";
 
 // Material Dashboard 2 PRO React examples
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
@@ -165,6 +166,13 @@ function DataTable({
               <MDTypography variant="caption" color="secondary">
                 &nbsp;&nbsp;entries per page
               </MDTypography>
+            </MDBox>
+          )}
+          {canSearch && (
+            <MDBox width="12rem" ml="auto">
+              <MDButton variant="gradient" color="info" fullWidth>
+                Update Selected Resume
+              </MDButton>
             </MDBox>
           )}
           {canSearch && (

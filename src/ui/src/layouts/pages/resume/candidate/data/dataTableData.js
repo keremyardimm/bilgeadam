@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import IdCell from "../components/IdCell";
 import PredictionCell from "../components/PredictionCell";
+import PredictionStatusCell from "../components/PredictionStatusCell";
 import StatusCell from "../components/StatusCell";
 // import DefaultCell from "../components/DefaultCell";
 
@@ -21,6 +22,10 @@ const dataTableData = {
       Header: "FYPS",
       accessor: "fyps",
       Cell: ({ value }) => <span>{value}</span>,
+    },
+    {
+      Header: "Status",
+      Cell: ({ row }) => <PredictionStatusCell data={row} />,
     },
     {
       Header: "prediction status",
