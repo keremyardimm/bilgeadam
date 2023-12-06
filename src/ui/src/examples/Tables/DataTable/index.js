@@ -57,7 +57,20 @@ function DataTable({
   const data = useMemo(() => table.rows, [table]);
 
   const tableInstance = useTable(
-    { columns, data, initialState: { pageIndex: 0 } },
+    {
+      columns,
+      data,
+      initialState: {
+        sortBy: [
+          {
+            id: "status",
+            desc: true,
+          },
+        ],
+        pageIndex: 0,
+      },
+      useSortBy,
+    },
     useGlobalFilter,
     useSortBy,
     usePagination
@@ -170,11 +183,12 @@ function DataTable({
           )}
           {canSearch && (
             <MDBox width="12rem" ml="auto">
-              <MDButton variant="gradient" color="info" fullWidth>
-                Update Selected Resume
+              <MDButton variant="gradient" color="info" fullWidth disabled>
+                Predictions
               </MDButton>
             </MDBox>
           )}
+
           {canSearch && (
             <MDBox width="12rem" ml="auto">
               <MDInput

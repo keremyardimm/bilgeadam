@@ -2,7 +2,7 @@ import Analytics from "layouts/dashboards/analytics";
 
 import NewResume from "layouts/pages/resume/new-resume";
 import ResumeList from "layouts/pages/resume/resume-list";
-import CandidateTrialPeriod from "layouts/pages/resume/candidate-trial-period";
+// import CandidateTrialPeriod from "layouts/pages/resume/candidate-trial-period";
 
 import Settings from "layouts/pages/account/settings";
 import SignInCover from "layouts/authentication/sign-in/cover";
@@ -69,12 +69,12 @@ const routes = [
             route: "/pages/resume/position-list",
             component: <ResumeList />,
           },
-          {
-            name: "Candidate Trial Period",
-            key: "candidate-trial-period",
-            route: "/pages/resume/candidate-trial-period",
-            component: <CandidateTrialPeriod />,
-          },
+          // {
+          //   name: "Candidate Trial Period",
+          //   key: "candidate-trial-period",
+          //   route: "/pages/resume/candidate-trial-period",
+          //   component: <CandidateTrialPeriod />,
+          // },
         ],
       },
       {

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // @mui material components
 /* eslint-disable no-debugger */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 
 // Material Dashboard 2 PRO React components
@@ -16,6 +16,8 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
+import { useDataContextController, setRemoveResume } from "../../../../context/dataContext";
+
 import DetailPopul from "./components/popup";
 import StatusCell from "./components/StatusCell";
 
@@ -24,33 +26,59 @@ import StatusCell from "./components/StatusCell";
 
 function DataTables() {
   const [open, setOpen] = useState(false);
+  const [controller, dispatch] = useDataContextController();
+  const { ResumeData = [] } = controller;
+
+  const statusRow = (value) => <StatusCell status={value} />;
+
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [totalResumeCount, setTotalResumeCount] = useState("");
+  const [selectedDescription, setSelectedDescription] = useState("");
+
+  const resumeSummary = ResumeData.reduce((acc, resume) => {
+    const key = `${resume.name}_${resume.resumeDescription}`;
+    if (!acc[key]) {
+      acc[key] = { ...resume, resumes: [resume], totalResumeCount: 1 };
+    } else {
+      acc[key].resumes.push(resume);
+      acc[key].totalResumeCount += 1;
+    }
+    return acc;
+  }, {});
+
+  const summarizedData = Object.values(resumeSummary);
 
   const onEditClick = (data) => {
-    console.log(data);
     setOpen(true);
   };
 
-  const onDeleteClick = (row, data) => {
-    console.log(data);
-    // setOpen(true);
+  const onDeleteClick = (data) => {
+    const resumeId = data.row.original.id;
+    setRemoveResume(dispatch, resumeId);
+  };
+
+  const onLoupeClick = (data) => {
+    setSelectedTitle(data.row.original.name);
+    setTotalResumeCount(data.row.original.totalResumeCount);
+    setSelectedDescription(data.row.original.resumeDescription);
+    setOpen(true);
   };
 
   const actionRow = (data) => {
     const { index, values } = data.row;
     const { status } = values;
     return (
-      <MDBox mt={2} width="100%" display="flex" justifyContent="center">
-        <IconButton onClick={() => onEditClick(data)} disabled={!status}>
+      <MDBox width="100%" display="flex" justifyContent="center">
+        <IconButton onClick={() => onLoupeClick(data)} disabled={!status}>
           <LoupeIcon color="secondary" />
         </IconButton>
+
         <IconButton onClick={() => onDeleteClick(data)} disabled={!status}>
           <DeleteIcon color="secondary" />
         </IconButton>
       </MDBox>
     );
   };
-
-  const statusRow = (value) => <StatusCell status={value} />;
 
   const dataTableData = {
     columns: [
@@ -65,46 +93,13 @@ function DataTables() {
         Cell: (data) => actionRow(data),
       },
     ],
-    rows: [
-      {
-        name: "Toyota",
-        resumeDescription: "Business Analyst",
-        createdUser: "Kerem Yardım",
-        createdDate: "4/11/2023",
-        totalResumeCount: "474",
-        status: false,
-      },
-      {
-        name: "Toyota 2",
-        resumeDescription: "Software Devoloper",
-        createdUser: "Kerem Yardım",
-        createdDate: "4/11/2023",
-        totalResumeCount: "1.300",
-        status: true,
-      },
-      {
-        name: "Toyota 3",
-        resumeDescription: "Frontend Devoloper",
-        createdUser: "Kerem Yardım",
-        createdDate: "4/11/2023",
-        totalResumeCount: "10",
-        status: true,
-      },
-      {
-        name: "Mercedes",
-        resumeDescription: "Backand Devoloper",
-        createdUser: "Kerem Yardım",
-        createdDate: "4/11/2023",
-        totalResumeCount: "358",
-        status: true,
-      },
-    ],
+    rows: summarizedData,
   };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <MDBox pt={6} pb={3}>
+      <MDBox pt={2} pb={3}>
         <MDBox mb={3}>
           <Card>
             <MDBox p={3} lineHeight={1}>
@@ -122,9 +117,10 @@ function DataTables() {
       <Footer />
       <DetailPopul
         open={open}
-        handleClose={() => {
-          setOpen(false);
-        }}
+        handleClose={() => setOpen(false)}
+        selectedTitle={selectedTitle}
+        totalResumeCount={totalResumeCount}
+        selectedDescription={selectedDescription}
       />
     </DashboardLayout>
   );

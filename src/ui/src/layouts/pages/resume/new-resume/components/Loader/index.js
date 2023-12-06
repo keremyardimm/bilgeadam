@@ -30,20 +30,15 @@ function CircularProgressWithLabel(props) {
   );
 }
 
-export default function CircularStatic(props) {
+function CircularStatic({ handleComplated }) {
   const [progress, setProgress] = React.useState(10);
-  const { handleComplated } = props;
-
-  CircularStatic.propTypes = {
-    handleComplated: PropTypes.func.isRequired,
-  };
 
   React.useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress >= 100) {
           clearInterval(timer);
-          handleComplated();
+          handleComplated(); // handleComplated fonksiyonunu çağır
           return 100;
         }
         return prevProgress + 10;
@@ -52,7 +47,14 @@ export default function CircularStatic(props) {
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [handleComplated]); // Bağımlılık olarak handleComplated ekleniyor
 
   return <CircularProgressWithLabel value={progress} />;
 }
+
+// PropTypes tanımı
+CircularStatic.propTypes = {
+  handleComplated: PropTypes.func.isRequired,
+};
+
+export default CircularStatic;

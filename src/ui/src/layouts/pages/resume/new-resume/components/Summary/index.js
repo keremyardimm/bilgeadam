@@ -1,16 +1,8 @@
-// prop-type is a library for typechecking of props
 import PropTypes from "prop-types";
-
-// @mui material components
 import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
-
-// Material Dashboard 2 PRO React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
-// NewUser page components
-// import FormField from "../FormField";
 
 function Summary({ formData }) {
   return (
@@ -62,24 +54,25 @@ function Summary({ formData }) {
               &nbsp;{formData.values.state.length <= 0 ? "Not Specified" : formData.values.state}
             </MDTypography>
           </MDBox>
-          <MDBox display="flex" py={1} pr={2}>
-            <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
-              Military Status &nbsp; :
-            </MDTypography>
-            <MDTypography variant="button" fontWeight="regular" color="text">
-              &nbsp;
-              {formData.values.militaryStatus.length <= 0
-                ? "Not Specified"
-                : formData.values.militaryStatus}
-            </MDTypography>
-          </MDBox>
+          {formData.values.gender !== "Female" && (
+            <MDBox display="flex" py={1} pr={2}>
+              <MDTypography variant="button" fontWeight="bold" textTransform="capitalize">
+                Military Status &nbsp; :
+              </MDTypography>
+              <MDTypography variant="button" fontWeight="regular" color="text">
+                &nbsp;
+                {formData.values.militaryStatus.length <= 0
+                  ? "Not Specified"
+                  : formData.values.militaryStatus}
+              </MDTypography>
+            </MDBox>
+          )}
         </MDBox>
       </MDBox>
     </Card>
   );
 }
 
-// typechecking props for Socials
 Summary.propTypes = {
   formData: PropTypes.oneOfType([PropTypes.object, PropTypes.func]).isRequired,
 };

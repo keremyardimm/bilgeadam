@@ -55,12 +55,59 @@ import {
   setOpenConfigurator,
 } from "context";
 
+import { useDataContextController } from "../../../context/dataContext";
+
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
   const [controller, dispatch] = useMaterialUIController();
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator, darkMode } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+
+  const [dataController] = useDataContextController();
+  const [delayedResumeCount, setDelayedResumeCount] = useState(dataController.ResumeData.length);
+  const [previousResumeData, setPreviousResumeData] = useState([]);
+  const [notification, setNotification] = useState(null);
+
+  useEffect(() => {
+    let timer;
+
+    if (notification) {
+      timer = setTimeout(() => {
+        setNotification(null);
+      }, 60000);
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [notification]);
+
+  useEffect(() => {
+    const newCompletedResumes = dataController.ResumeData.filter(
+      (resume) =>
+        resume.status === "done" &&
+        !previousResumeData.find(
+          (prevResume) => prevResume.id === resume.id && prevResume.status === "done"
+        )
+    );
+
+    if (newCompletedResumes.length > 0 && previousResumeData.length > 0) {
+      setNotification(newCompletedResumes[0]);
+    }
+
+    setPreviousResumeData(dataController.ResumeData);
+  }, [dataController.ResumeData]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDelayedResumeCount(dataController.ResumeData.length);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [dataController.ResumeData]);
 
   useEffect(() => {
     // Setting the navbar type
@@ -106,9 +153,21 @@ function DashboardNavbar({ absolute, light, isMini }) {
       onClose={handleCloseMenu}
       sx={{ mt: 2 }}
     >
-      <NotificationItem icon={<Icon>email</Icon>} title="9 Resume Request Complated" />
-      {/* <NotificationItem icon={<Icon>podcasts</Icon>} title="Manage Resume Request" /> */}
-      {/* <NotificationItem icon={<Icon>shopping_cart</Icon>} title="Payment successfully completed" /> */}
+      {delayedResumeCount > 0 ? (
+        <NotificationItem
+          icon={<Icon>email</Icon>}
+          title={`${delayedResumeCount} Resume Request Completed`}
+        />
+      ) : (
+        <NotificationItem icon={<Icon>email</Icon>} title="No Resume Request" />
+      )}
+
+      {notification && (
+        <NotificationItem
+          icon={<Icon>done_all</Icon>}
+          title={`${notification.name} Resume Request Completed!`}
+        />
+      )}
     </Menu>
   );
 
@@ -181,9 +240,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 variant="contained"
                 onClick={handleOpenMenu}
               >
-                <MDBadge badgeContent={9} color="error" size="xs" circular>
+                {delayedResumeCount > 0 ? (
+                  <MDBadge badgeContent={`${delayedResumeCount}`} color="error" size="xs" circular>
+                    <Icon sx={iconsStyle}>notifications</Icon>
+                  </MDBadge>
+                ) : (
                   <Icon sx={iconsStyle}>notifications</Icon>
-                </MDBadge>
+                )}
               </IconButton>
               {renderMenu()}
             </MDBox>

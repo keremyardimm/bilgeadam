@@ -103,19 +103,21 @@ function Address({ formData }) {
               renderInput={(params) => <MDInput {...params} variant="standard" label="State" />}
             />
           </Grid>
-          <Grid item xs={6} sm={3}>
-            <Autocomplete
-              options={["Completed", "Not Completed"]}
-              name={militaryStatus.name}
-              onChange={(event, newValue) => {
-                setFieldValue(militaryStatus.name, newValue ?? "");
-              }}
-              inputValue={militaryStatusValue}
-              renderInput={(params) => (
-                <MDInput {...params} variant="standard" label="Military Status" />
-              )}
-            />
-          </Grid>
+          {genderValue !== "Female" && (
+            <Grid item xs={6} sm={3}>
+              <Autocomplete
+                options={["Completed", "Not Completed"]}
+                name={militaryStatus.name}
+                onChange={(event, newValue) => {
+                  setFieldValue(militaryStatus.name, newValue ?? "");
+                }}
+                inputValue={militaryStatusValue}
+                renderInput={(params) => (
+                  <MDInput {...params} variant="standard" label="Military Status" />
+                )}
+              />
+            </Grid>
+          )}
         </Grid>
       </MDBox>
     </MDBox>

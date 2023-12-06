@@ -25,29 +25,29 @@ import MDTypography from "components/MDTypography";
 import MDButton from "components/MDButton";
 
 function StatusCell({ status }) {
+  const isDone = status === "done";
   return (
     <MDBox display="flex" alignItems="center">
       <MDBox mr={1}>
         <MDButton
           variant="outlined"
-          color={status ? "dark" : "success"}
+          color={isDone ? "dark" : "success"}
           size="small"
           iconOnly
           circular
         >
-          <Icon sx={{ fontWeight: "bold" }}>{status ? "done" : "close"}</Icon>
+          <Icon sx={{ fontWeight: "bold" }}>{isDone ? "done" : "close"}</Icon>
         </MDButton>
       </MDBox>
       <MDTypography variant="caption" fontWeight="medium" color="text" sx={{ lineHeight: 0 }}>
-        {status ? "Done" : "In Progress"}
+        {isDone ? "Done" : "In Progress"}
       </MDTypography>
     </MDBox>
   );
 }
 
-// Typechecking props for the StatusCell
 StatusCell.propTypes = {
-  status: PropTypes.bool.isRequired,
+  status: PropTypes.string.isRequired,
 };
 
 export default StatusCell;

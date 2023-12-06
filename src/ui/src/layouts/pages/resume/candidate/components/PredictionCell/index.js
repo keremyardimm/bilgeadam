@@ -87,7 +87,7 @@ function PredictioncCell({ data }) {
             </MDBox>
             <MDBox width="80%" ml={0.5}>
               <MDTypography variant="button" fontWeight="regular" color="text">
-                Trail Period prediction Score
+                Trial Period prediction Score
               </MDTypography>
             </MDBox>
           </MDBox>

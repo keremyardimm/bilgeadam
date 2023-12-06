@@ -11,30 +11,50 @@ DataContext.displayName = "ApplicationDataContext";
 
 // Material Dashboard 2 PRO React reducer
 function reducer(state, action) {
+  let newState;
   switch (action.type) {
     case "UPDATE_RESUME": {
-      //   console.log("updateResume", action.value);
-      return { ...state, ResumeData: action.value };
+      const updatedResumes = state.ResumeData.map((resume) =>
+        resume.id === action.id ? { ...resume, status: action.status } : resume
+      );
+      newState = { ...state, ResumeData: updatedResumes };
+      break;
     }
     case "ADD_RESUME": {
-      return { ...state, ResumeData: action.value };
+      const totalResumeCount = state.ResumeData.length + 1; // Total resume count'ı hesapla
+      const newResumeWithCount = {
+        ...action.newResume,
+        totalResumeCount, // Yeni resume objesine totalResumeCount ekle
+      };
+      newState = { ...state, ResumeData: [...state.ResumeData, newResumeWithCount] };
+      break;
     }
+
     case "REMOVE_RESUME": {
-      return { ...state, ResumeData: action.value };
+      newState = {
+        ...state,
+        ResumeData: state.ResumeData.filter((resume) => resume.id !== action.value),
+      };
+      break;
     }
     case "UPDATE_USER_STATE": {
-      return { ...state, UserData: action.value };
+      newState = { ...state, UserData: action.value };
+      break;
     }
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
   }
+
+  // Yapılan değişiklikleri LocalStorage'a kaydetme
+  localStorage.setItem("resumeData", JSON.stringify(newState.ResumeData));
+  return newState;
 }
 
 // Material Dashboard 2 PRO React context provider
 function DataContextControllerProvider({ children }) {
   const initialState = {
-    ResumeData: [],
+    ResumeData: JSON.parse(localStorage.getItem("resumeData")) || [],
     UserData: [],
   };
 
@@ -64,8 +84,8 @@ DataContextControllerProvider.propTypes = {
 };
 
 // Context module functions
-const setUpdateResume = (dispatch, value) => dispatch({ type: "UPDATE_RESUME", value });
-const setAddResume = (dispatch, value) => dispatch({ type: "ADD_RESUME", value });
+const setUpdateResume = (dispatch, id, status) => dispatch({ type: "UPDATE_RESUME", id, status });
+const setAddResume = (dispatch, newResume) => dispatch({ type: "ADD_RESUME", newResume });
 const setRemoveResume = (dispatch, value) => dispatch({ type: "REMOVE_RESUME", value });
 const setUpdateUserState = (dispatch, value) => dispatch({ type: "UPDATE_USER_STATE", value });
 

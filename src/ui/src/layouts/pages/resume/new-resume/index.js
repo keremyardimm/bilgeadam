@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-debugger */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // formik components
 import { Formik, Form } from "formik";
@@ -32,6 +32,12 @@ import form from "./schemas/form";
 import initialValues from "./schemas/initialValues";
 import validations from "./schemas/validations";
 
+import {
+  useDataContextController,
+  setAddResume,
+  setUpdateResume,
+} from "../../../../context/dataContext";
+
 function getSteps() {
   return ["Resume Info", "Summary"];
 }
@@ -50,6 +56,18 @@ function getStepContent(stepIndex, formData) {
 function NewUser() {
   const [activeStep, setActiveStep] = useState(0);
   const [showLoader, setShowLoader] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const [controller, dispatch] = useDataContextController();
+
+  useEffect(() => {
+    if (isCompleted) {
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 2000);
+    }
+  }, [isCompleted]);
 
   const steps = getSteps();
   const { formId, formField } = form;
@@ -71,10 +89,54 @@ function NewUser() {
     // setActiveStep(0);
   };
 
-  const handleSubmit = (values, actions) => {
-    if (isLastStep) {
-      setShowLoader(true);
+  function calculateTotalResumeCount(ResumeData) {
+    return ResumeData.length + 1;
+  }
 
+  const handleSubmit = (values, actions) => {
+    setIsCompleted(false);
+
+    const resumeId = values.resumeTitle + values.position;
+    const existingResumeIndex = controller.ResumeData.findIndex((resume) => resume.id === resumeId);
+
+    if (isLastStep) {
+      if (
+        existingResumeIndex !== -1 &&
+        controller.ResumeData[existingResumeIndex].totalResumeCount ===
+          calculateTotalResumeCount(controller.ResumeData)
+      ) {
+        setUpdateResume(dispatch, resumeId, {
+          ...controller.ResumeData[existingResumeIndex],
+          ...values,
+          status: "in progress",
+        });
+      } else {
+        setAddResume(
+          dispatch,
+          {
+            ...values,
+            name: values.resumeTitle,
+            resumeDescription: values.position,
+            createdUser: "admin",
+            status: "in progress",
+            createdDate: new Date().toLocaleDateString(),
+            totalResumeCount: controller.ResumeData.length + 1,
+            id: resumeId,
+          },
+          setUpdateResume(dispatch, resumeId, {
+            ...controller.ResumeData[existingResumeIndex],
+            ...values,
+            status: "in progress",
+          })
+        );
+      }
+
+      // Status'u 1 dakika sonra "done" olarak güncelle
+      setTimeout(() => {
+        setUpdateResume(dispatch, resumeId, "done");
+      }, 60000);
+
+      setShowLoader(true);
       submitForm(values, actions);
     } else {
       setShowLoader(false);
@@ -85,17 +147,11 @@ function NewUser() {
   };
 
   const handleComplated = async (values, setSubmitting, resetForm) => {
-    // eslint-disable-next-line no-alert
-    alert(JSON.stringify(values, null, 2));
-
+    setIsCompleted(true);
     setSubmitting(false);
-
     resetForm();
-
     setActiveStep(0);
-
     setShowLoader(false);
-
     await sleep(1000);
   };
 
@@ -131,49 +187,63 @@ function NewUser() {
                       </Stepper>
                     </MDBox>
                     <MDBox p={3}>
-                      <MDBox>
-                        {!showLoader &&
-                          getStepContent(activeStep, {
-                            values,
-                            touched,
-                            formField,
-                            errors,
-                            setFieldValue,
-                          })}
-                        {showLoader && (
-                          <MDBox>
-                            <MDBox mt={2} width="100%" display="flex" justifyContent="center">
-                              <CircularStatic
-                                handleComplated={() =>
-                                  handleComplated(values, setSubmitting, resetForm)
-                                }
-                              />
-                            </MDBox>
-                            <MDBox mt={2} width="100%" display="flex" justifyContent="center">
-                              <Typography variant="caption" component="div" color="text.secondary">
-                                In Progress
-                              </Typography>
-                            </MDBox>
-                          </MDBox>
-                        )}
-                        <MDBox mt={2} width="100%" display="flex" justifyContent="space-between">
-                          {activeStep === 0 ? (
-                            <MDBox />
-                          ) : (
-                            <MDButton variant="gradient" color="light" onClick={handleBack}>
-                              back
-                            </MDButton>
-                          )}
-                          <MDButton
-                            disabled={isSubmitting}
-                            type="submit"
-                            variant="gradient"
-                            color="dark"
-                          >
-                            {isLastStep ? "create" : "next"}
-                          </MDButton>
+                      {showMessage ? (
+                        <MDBox p={2}>
+                          <Typography variant="h6" color="success.main">
+                            Kayıt işlemi başarıyla tamamlandı!
+                          </Typography>
                         </MDBox>
-                      </MDBox>
+                      ) : (
+                        <>
+                          <MDBox>
+                            {!showLoader &&
+                              getStepContent(activeStep, {
+                                values,
+                                touched,
+                                formField,
+                                errors,
+                                setFieldValue,
+                              })}
+                            {showLoader && (
+                              <MDBox>
+                                <MDBox mt={2} width="100%" display="flex" justifyContent="center">
+                                  <CircularStatic
+                                    handleComplated={() =>
+                                      handleComplated(values, setSubmitting, resetForm)
+                                    }
+                                  />
+                                </MDBox>
+                                <MDBox mt={2} width="100%" display="flex" justifyContent="center">
+                                  <Typography
+                                    variant="caption"
+                                    component="div"
+                                    color="text.secondary"
+                                  >
+                                    In Progress
+                                  </Typography>
+                                </MDBox>
+                              </MDBox>
+                            )}
+                          </MDBox>
+                          <MDBox mt={2} width="100%" display="flex" justifyContent="space-between">
+                            {activeStep === 0 ? (
+                              <MDBox />
+                            ) : (
+                              <MDButton variant="gradient" color="light" onClick={handleBack}>
+                                back
+                              </MDButton>
+                            )}
+                            <MDButton
+                              disabled={isSubmitting}
+                              type="submit"
+                              variant="gradient"
+                              color="dark"
+                            >
+                              {isLastStep ? "create" : "next"}
+                            </MDButton>
+                          </MDBox>
+                        </>
+                      )}
                     </MDBox>
                   </Card>
                 </Form>
