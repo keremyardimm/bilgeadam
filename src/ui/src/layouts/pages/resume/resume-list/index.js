@@ -4,14 +4,12 @@
 import { useState, useEffect } from "react";
 import Card from "@mui/material/Card";
 
-// Material Dashboard 2 PRO React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoupeIcon from "@mui/icons-material/Loupe";
 
-// Material Dashboard 2 PRO React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -20,9 +18,6 @@ import { useDataContextController, setRemoveResume } from "../../../../context/d
 
 import DetailPopul from "./components/popup";
 import StatusCell from "./components/StatusCell";
-
-// Data
-// import dataTableData from "layouts/pages/resume/resume-list/data/dataTableData";
 
 function DataTables() {
   const [open, setOpen] = useState(false);
@@ -69,11 +64,11 @@ function DataTables() {
     const { status } = values;
     return (
       <MDBox width="100%" display="flex" justifyContent="center">
-        <IconButton onClick={() => onLoupeClick(data)} disabled={!status}>
+        <IconButton onClick={() => onLoupeClick(data)} disabled={status === "in progress"}>
           <LoupeIcon color="secondary" />
         </IconButton>
 
-        <IconButton onClick={() => onDeleteClick(data)} disabled={!status}>
+        <IconButton onClick={() => onDeleteClick(data)} disabled={status === "in progress"}>
           <DeleteIcon color="secondary" />
         </IconButton>
       </MDBox>

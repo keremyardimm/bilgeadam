@@ -1,15 +1,9 @@
 import { createContext, useContext, useMemo, useReducer } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
 
-// The Material Dashboard 2 PRO React main context
 const DataContext = createContext();
-
-// Setting custom name for the context which is visible on react dev tools
 DataContext.displayName = "ApplicationDataContext";
 
-// Material Dashboard 2 PRO React reducer
 function reducer(state, action) {
   let newState;
   switch (action.type) {
@@ -21,10 +15,10 @@ function reducer(state, action) {
       break;
     }
     case "ADD_RESUME": {
-      const totalResumeCount = state.ResumeData.length + 1; // Total resume count'ı hesapla
+      const totalResumeCount = state.ResumeData.length + 1;
       const newResumeWithCount = {
         ...action.newResume,
-        totalResumeCount, // Yeni resume objesine totalResumeCount ekle
+        totalResumeCount,
       };
       newState = { ...state, ResumeData: [...state.ResumeData, newResumeWithCount] };
       break;
@@ -41,17 +35,19 @@ function reducer(state, action) {
       newState = { ...state, UserData: action.value };
       break;
     }
+    case "SET_SELECTED_ROWS": {
+      return { ...state, selectedRowIds: action.selectedRowIds };
+    }
+
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);
     }
   }
 
-  // Yapılan değişiklikleri LocalStorage'a kaydetme
   localStorage.setItem("resumeData", JSON.stringify(newState.ResumeData));
   return newState;
 }
 
-// Material Dashboard 2 PRO React context provider
 function DataContextControllerProvider({ children }) {
   const initialState = {
     ResumeData: JSON.parse(localStorage.getItem("resumeData")) || [],
@@ -65,7 +61,6 @@ function DataContextControllerProvider({ children }) {
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 }
 
-// Material Dashboard 2 PRO React custom hook for using context
 function useDataContextController() {
   const context = useContext(DataContext);
 
@@ -78,12 +73,10 @@ function useDataContextController() {
   return context;
 }
 
-// Typechecking props for the MaterialUIControllerProvider
 DataContextControllerProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Context module functions
 const setUpdateResume = (dispatch, id, status) => dispatch({ type: "UPDATE_RESUME", id, status });
 const setAddResume = (dispatch, newResume) => dispatch({ type: "ADD_RESUME", newResume });
 const setRemoveResume = (dispatch, value) => dispatch({ type: "REMOVE_RESUME", value });

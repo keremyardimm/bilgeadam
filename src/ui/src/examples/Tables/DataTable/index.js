@@ -1,27 +1,8 @@
-/**
-=========================================================
-* Material Dashboard 2 PRO React - v2.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-pro-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
+/* eslint-disable react/prop-types */
 import { useMemo, useEffect, useState } from "react";
-
-// prop-types is a library for typechecking of props
 import PropTypes from "prop-types";
-
-// react-table components
 import { useTable, usePagination, useGlobalFilter, useAsyncDebounce, useSortBy } from "react-table";
 
-// @mui material components
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
@@ -29,18 +10,18 @@ import TableRow from "@mui/material/TableRow";
 import Icon from "@mui/material/Icon";
 import Autocomplete from "@mui/material/Autocomplete";
 
-// Material Dashboard 2 PRO React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDPagination from "components/MDPagination";
 import MDButton from "components/MDButton";
 
-// Material Dashboard 2 PRO React examples
 import DataTableHeadCell from "examples/Tables/DataTable/DataTableHeadCell";
 import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
 
 function DataTable({
+  // eslint-disable-next-line react/prop-types
+  selectedRows,
   entriesPerPage,
   canSearch,
   showTotalEntries,
@@ -94,13 +75,10 @@ function DataTable({
     state: { pageIndex, pageSize, globalFilter },
   } = tableInstance;
 
-  // Set the default value for the entries per page when component mounts
   useEffect(() => setPageSize(defaultValue || 10), [defaultValue]);
 
-  // Set the entries per page value based on the select value
   const setEntriesPerPage = (value) => setPageSize(value);
 
-  // Render the paginations
   const renderPagination = pageOptions.map((option) => (
     <MDPagination
       item
@@ -112,25 +90,19 @@ function DataTable({
     </MDPagination>
   ));
 
-  // Handler for the input to set the pagination index
   const handleInputPagination = ({ target: { value } }) =>
     value > pageOptions.length || value < 0 ? gotoPage(0) : gotoPage(Number(value));
 
-  // Customized page options starting from 1
   const customizedPageOptions = pageOptions.map((option) => option + 1);
 
-  // Setting value for the pagination input
   const handleInputPaginationValue = ({ target: value }) => gotoPage(Number(value.value - 1));
 
-  // Search input value state
   const [search, setSearch] = useState(globalFilter);
 
-  // Search input state handle
   const onSearchChange = useAsyncDebounce((value) => {
     setGlobalFilter(value || undefined);
   }, 100);
 
-  // A function that sets the sorted value for the table
   const setSortedValue = (column) => {
     let sortedValue;
 
@@ -145,10 +117,8 @@ function DataTable({
     return sortedValue;
   };
 
-  // Setting the entries starting point
   const entriesStart = pageIndex === 0 ? pageIndex + 1 : pageIndex * pageSize + 1;
 
-  // Setting the entries ending point
   let entriesEnd;
 
   if (pageIndex === 0) {
@@ -183,7 +153,7 @@ function DataTable({
           )}
           {canSearch && (
             <MDBox width="12rem" ml="auto">
-              <MDButton variant="gradient" color="info" fullWidth disabled>
+              <MDButton variant="gradient" color="info" fullWidth disabled={!selectedRows.length}>
                 Predictions
               </MDButton>
             </MDBox>
@@ -289,7 +259,6 @@ function DataTable({
   );
 }
 
-// Setting default values for the props of DataTable
 DataTable.defaultProps = {
   entriesPerPage: { defaultValue: 10, entries: [5, 10, 15, 20, 25] },
   canSearch: false,
@@ -299,7 +268,6 @@ DataTable.defaultProps = {
   noEndBorder: false,
 };
 
-// Typechecking props for the DataTable
 DataTable.propTypes = {
   entriesPerPage: PropTypes.oneOfType([
     PropTypes.shape({

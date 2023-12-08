@@ -1,47 +1,48 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import * as React from "react";
-import Button from "@mui/material/Button";
+import React, { useState, useContext } from "react";
 import Dialog from "@mui/material/Dialog";
-import ListItemText from "@mui/material/ListItemText";
-import ListItem from "@mui/material/ListItem";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import Card from "@mui/material/Card";
 import AnnouncementIcon from "@mui/icons-material/Announcement";
+import Checkbox from "@mui/material/Checkbox";
 
-// Material Dashboard 2 PRO React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 
-// Material Dashboard 2 PRO React examples
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 
-// Data
-import dataTableData from "layouts/pages/resume/candidate/data/dataTableData";
+import PredictionCell from "../../../candidate/components/PredictionCell";
+import PredictionStatusCell from "../../../candidate/components/PredictionStatusCell";
+import StatusCell from "../../../candidate/components/StatusCell";
+
+import { useDataContextController } from "../../../../../../context/dataContext";
 
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
 export default function FullScreenDialog(props) {
   const { open, handleClose, totalResumeCount } = props;
 
-  const limitedDataTableData = {
-    ...dataTableData, // dataTableData'nın diğer ayarlarını koruyun
-    rows: dataTableData.rows.slice(0, totalResumeCount), // rows dizisini totalResumeCount'a göre sınırlayın
+  const [controller, dispatch] = useDataContextController();
+  const [selectedRows, setSelectedRows] = useState(controller.selectedRows || []);
+
+  const handleCheckboxChange = (rowId) => {
+    const isSelected = selectedRows.includes(rowId);
+    const newSelectedRows = isSelected
+      ? selectedRows.filter((id) => id !== rowId)
+      : [...selectedRows, rowId];
+
+    setSelectedRows(newSelectedRows);
+
+    dispatch({ type: "SET_SELECTED_ROWS", selectedRowIds: newSelectedRows });
+    console.log("selectedRows", selectedRows);
   };
 
   return (
@@ -132,7 +133,117 @@ export default function FullScreenDialog(props) {
               </MDBox>
 
               <DataTable
-                table={limitedDataTableData}
+                selectedRows={selectedRows}
+                table={{
+                  columns: [
+                    // eslint-disable-next-line react/no-unstable-nested-components
+                    {
+                      Header: "id",
+                      accessor: "_id",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ value }) => (
+                        <MDBox display="flex" alignItems="center">
+                          <Checkbox
+                            checked={selectedRows.includes(value)}
+                            onChange={() => handleCheckboxChange(value)}
+                          />
+                          <MDBox ml={1}>
+                            <MDTypography variant="caption" fontWeight="medium" color="text">
+                              {value}
+                            </MDTypography>
+                          </MDBox>
+                        </MDBox>
+                      ),
+                    },
+                    { Header: "Candidate", accessor: "name", width: "20%" },
+                    { Header: "Email", accessor: "email", width: "20%" },
+                    { Header: "Phone", accessor: "phone", width: "10%" },
+                    { Header: "Gender", accessor: "gender" },
+                    { Header: "Age", accessor: "age" },
+                    {
+                      Header: "TPPS",
+                      accessor: "tpps",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ value }) => <span>{value}</span>,
+                    },
+                    {
+                      Header: "FYPS",
+                      accessor: "fyps",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ value }) => <span>{value}</span>,
+                    },
+                    {
+                      Header: "Status",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ row }) => <PredictionStatusCell data={row} />,
+                    },
+                    {
+                      Header: "prediction status",
+                      accessor: "status",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ value }) => <StatusCell status={value} />,
+                    },
+                    {
+                      Header: "prediction",
+                      // eslint-disable-next-line react/no-unstable-nested-components
+                      Cell: ({ row }) => <PredictionCell data={row} />,
+                    },
+                  ],
+                  rows: [
+                    {
+                      _id: 1,
+                      isActive: false,
+                      picture: "http://placehold.it/32x32",
+                      age: 22,
+                      name: "Sandra Carroll",
+                      gender: "female",
+                      company: "UPDAT",
+                      email: "sandracarroll@updat.com",
+                      phone: "+1 (931) 413-2849",
+                      address: "440 Aberdeen Street, Hobucken, Wyoming, 9716",
+                      about: "Do in aliquip ex voluptate ea in. \r\n",
+                      registered: "2023-02-20T10:02:20 -03:00",
+                      tpps: 0.2,
+                      fyps: 1,
+                      status: false,
+                    },
+                    {
+                      _id: 2,
+                      isActive: false,
+                      picture: "http://placehold.it/32x32",
+                      age: 33,
+                      name: "Drake Mejia",
+                      gender: "male",
+                      company: "EARTHPLEX",
+                      email: "drakemejia@earthplex.com",
+                      phone: "+1 (952) 540-2129",
+                      address: "278 Corbin Place, Groton, New Hampshire, 887",
+                      about: "Culpa eiusmod irure sit nostrud sunt. \r\n",
+                      registered: "2015-11-21T04:05:37 -02:00",
+                      tpps: 1,
+                      fyps: 0.4,
+                      status: false,
+                    },
+                    {
+                      _id: 3,
+                      isActive: false,
+                      picture: "http://placehold.it/32x32",
+                      age: 22,
+                      name: "Minnie Sanford",
+                      gender: "female",
+                      company: "MEDIFAX",
+                      email: "minniesanford@medifax.com",
+                      phone: "+1 (805) 545-3777",
+                      address: "357 Brightwater Avenue, Slovan, South Carolina, 1318",
+                      about:
+                        "Minim culpa cupidatat elit labore. Anim excepteur id consequat tempor quis aliquip fugiat tempor.\r\n",
+                      registered: "2016-06-14T04:39:57 -03:00",
+                      tpps: 0.5,
+                      fyps: 0.1,
+                      status: false,
+                    },
+                  ].slice(0, totalResumeCount),
+                }}
                 canSearch
                 setGlobalFilter={(value) => {
                   console.log(value);
