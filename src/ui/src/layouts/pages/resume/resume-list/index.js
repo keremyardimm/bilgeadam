@@ -14,10 +14,13 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
+import { useAsyncDebounce, setGlobalFilter } from "react-table";
+
 import { useDataContextController, setRemoveResume } from "../../../../context/dataContext";
 
 import DetailPopul from "./components/popup";
 import StatusCell from "./components/StatusCell";
+import MDInput from "../../../../components/MDInput";
 
 function DataTables() {
   const [open, setOpen] = useState(false);
@@ -97,13 +100,18 @@ function DataTables() {
       <MDBox pt={2} pb={3}>
         <MDBox mb={3}>
           <Card>
-            <MDBox p={3} lineHeight={1}>
-              <MDTypography variant="h5" fontWeight="medium">
-                Position List
-              </MDTypography>
-              <MDTypography variant="button" color="text">
-                You can see your position list below. You can recheck your old call details
-              </MDTypography>
+            <MDBox style={{ display: "flex", justifyContent: "space-between" }}>
+              <MDBox p={3} lineHeight={1}>
+                <MDTypography variant="h5" fontWeight="medium">
+                  Position List
+                </MDTypography>
+                <MDTypography variant="button" color="text">
+                  You can see your position list below. You can recheck your old call details
+                </MDTypography>
+              </MDBox>
+              <MDBox p={3}>
+                <MDInput placeholder="Search..." size="small" />
+              </MDBox>
             </MDBox>
             <DataTable table={dataTableData} />
           </Card>

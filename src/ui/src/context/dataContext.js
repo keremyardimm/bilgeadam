@@ -38,6 +38,9 @@ function reducer(state, action) {
     case "SET_SELECTED_ROWS": {
       return { ...state, selectedRowIds: action.selectedRowIds };
     }
+    case "UPDATE_DATA": {
+      return { ...state, ResumeData: action.newData };
+    }
 
     default: {
       throw new Error(`Unhandled action type: ${action.type}`);

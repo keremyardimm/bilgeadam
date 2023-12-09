@@ -22,6 +22,7 @@ import DataTableBodyCell from "examples/Tables/DataTable/DataTableBodyCell";
 function DataTable({
   // eslint-disable-next-line react/prop-types
   selectedRows,
+  updateTableRows,
   entriesPerPage,
   canSearch,
   showTotalEntries,
@@ -29,11 +30,13 @@ function DataTable({
   pagination,
   isSorted,
   noEndBorder,
+  searchInput,
 }) {
   const defaultValue = entriesPerPage.defaultValue ? entriesPerPage.defaultValue : 10;
   const entries = entriesPerPage.entries
     ? entriesPerPage.entries.map((el) => el.toString())
     : ["5", "10", "15", "20", "25"];
+
   const columns = useMemo(() => table.columns, [table]);
   const data = useMemo(() => table.rows, [table]);
 
@@ -50,6 +53,7 @@ function DataTable({
         ],
         pageIndex: 0,
       },
+      globalFilter: searchInput,
       useSortBy,
     },
     useGlobalFilter,
@@ -129,6 +133,29 @@ function DataTable({
     entriesEnd = pageSize * (pageIndex + 1);
   }
 
+  const handlePredictionsClick = () => {
+    const updatedRowsInProgress = table.rows.map((row) =>
+      // eslint-disable-next-line no-underscore-dangle
+      selectedRows.includes(row._id) ? { ...row, status: false, tpps: "-", fyps: "-" } : row
+    );
+    updateTableRows(updatedRowsInProgress);
+
+    setTimeout(() => {
+      const updatedRowsDone = table.rows.map((row) =>
+        // eslint-disable-next-line no-underscore-dangle
+        selectedRows.includes(row._id)
+          ? {
+              ...row,
+              status: "Done",
+              tpps: Math.random().toFixed(2),
+              fyps: Math.random().toFixed(2),
+            }
+          : row
+      );
+      updateTableRows(updatedRowsDone);
+    }, 10000);
+  };
+
   return (
     <TableContainer sx={{ boxShadow: "none" }}>
       {entriesPerPage || canSearch ? (
@@ -153,7 +180,13 @@ function DataTable({
           )}
           {canSearch && (
             <MDBox width="12rem" ml="auto">
-              <MDButton variant="gradient" color="info" fullWidth disabled={!selectedRows.length}>
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                disabled={!selectedRows.length}
+                onClick={handlePredictionsClick}
+              >
                 Predictions
               </MDButton>
             </MDBox>
@@ -266,9 +299,13 @@ DataTable.defaultProps = {
   pagination: { variant: "gradient", color: "info" },
   isSorted: true,
   noEndBorder: false,
+  // eslint-disable-next-line react/default-props-match-prop-types
+  updateData: () => {},
 };
 
 DataTable.propTypes = {
+  // eslint-disable-next-line react/require-default-props
+  updateData: PropTypes.func.isRequired,
   entriesPerPage: PropTypes.oneOfType([
     PropTypes.shape({
       defaultValue: PropTypes.number,

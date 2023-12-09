@@ -13,6 +13,7 @@ function PredictionStatusCell({ data }) {
   useEffect(() => {
     const { original } = data;
     const { tpps } = original;
+    console.log(tpps);
 
     if (tpps <= 0.5) {
       setIcon("error");
@@ -25,7 +26,9 @@ function PredictionStatusCell({ data }) {
 
   return (
     <MDTypography variant="caption" fontWeight="bold" color={icon} fontSize={25}>
-      <OnlinePredictionIcon sx={{ fontWeight: "bold", fontSize: 40 }} />
+      {data.original.tpps !== "-" && (
+        <OnlinePredictionIcon sx={{ fontWeight: "bold", fontSize: 40 }} />
+      )}
     </MDTypography>
   );
 }
