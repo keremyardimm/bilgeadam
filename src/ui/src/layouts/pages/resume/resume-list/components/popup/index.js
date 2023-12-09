@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-boolean-value */
+/* eslint-disable react/self-closing-comp */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
@@ -86,6 +88,41 @@ export default function FullScreenDialog(props) {
       fyps: 0.1,
       status: true,
     },
+    {
+      _id: 4,
+      isActive: false,
+      picture: "http://placehold.it/32x32",
+      age: 36,
+      name: "Lois Briggs",
+      gender: "female",
+      company: "FUTURITY",
+      email: "loisbriggs@futurity.com",
+      phone: "+1 (937) 530-2531",
+      address: "305 Clarendon Road, Topanga, New Jersey, 3210",
+      about:
+        "Commodo consectetur in laborum aliqua adipisicing ipsum incididunt veniam nostrud. \r\n",
+      registered: "2016-01-06T11:03:51 -02:00",
+      tpps: 0.6,
+      fyps: 0.1,
+      status: false,
+    },
+    {
+      _id: 5,
+      isActive: false,
+      picture: "http://placehold.it/32x32",
+      age: 27,
+      name: "Kelly Holland",
+      gender: "male",
+      company: "ADORNICA",
+      email: "kellyholland@adornica.com",
+      phone: "+1 (877) 528-2175",
+      address: "701 Harden Street, Sutton, Pennsylvania, 2064",
+      about: "Aliquip officia occaecat ad consectetur adipisicing cupidatat amet.\r\n",
+      registered: "2014-01-03T07:36:11 -02:00",
+      tpps: 0.3,
+      fyps: 0.5,
+      status: false,
+    },
   ]);
 
   const updateTableRows = (newRows) => {
@@ -95,11 +132,6 @@ export default function FullScreenDialog(props) {
   useEffect(() => {
     setCandidateData(controller.ResumeData || []);
   }, [controller.ResumeData]);
-
-  const updateCandidateData = (newData) => {
-    setCandidateData(newData);
-    dispatch({ type: "UPDATE_DATA", newData });
-  };
 
   const handleCheckboxChange = (rowId) => {
     const isSelected = selectedRows.includes(rowId);
@@ -112,27 +144,39 @@ export default function FullScreenDialog(props) {
     dispatch({ type: "SET_SELECTED_ROWS", selectedRowIds: newSelectedRows });
   };
 
+  const [showInterviewList, setShowInterviewList] = useState(false);
+
+  const handleArrangeInterviewClick = () => {
+    setShowInterviewList(true);
+  };
+
+  const handleCloseDialog = () => {
+    handleClose();
+    setShowInterviewList(false);
+    setSelectedRows([]);
+  };
+
   return (
     <div>
       <Dialog
         fullScreen
         open={open}
         onClose={() => {
-          handleClose();
+          handleCloseDialog();
         }}
         TransitionComponent={Transition}
       >
         <AppBar sx={{ position: "relative" }}>
           <Toolbar>
-            <IconButton edge="end" color="inherit" onClick={handleClose} aria-label="close">
+            <IconButton edge="end" color="inherit" onClick={handleCloseDialog} aria-label="close">
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Short List Detail
+              {showInterviewList ? "Interview List" : "Short List Detail"}
             </Typography>
           </Toolbar>
         </AppBar>
-        <MDBox pb={3}>
+        <MDBox pb={3} hidden={showInterviewList}>
           <MDBox mb={3}>
             <Card>
               <MDBox p={3} lineHeight={1}>
@@ -203,6 +247,7 @@ export default function FullScreenDialog(props) {
                 selectedRows={selectedRows}
                 updateTableRows={updateTableRows}
                 data={candidateData}
+                onArrangeInterviewClick={handleArrangeInterviewClick}
                 table={{
                   columns: [
                     // eslint-disable-next-line react/no-unstable-nested-components
@@ -262,10 +307,61 @@ export default function FullScreenDialog(props) {
                   rows: tableRows.slice(0, totalResumeCount),
                 }}
                 canSearch
-                setGlobalFilter={(value) => {
-                  console.log(value);
-                }}
+                setGlobalFilter={(value) => {}}
               />
+            </Card>
+          </MDBox>
+        </MDBox>
+
+        <MDBox mb={3} hidden={!showInterviewList}>
+          <MDBox mb={3}>
+            <Card>
+              <MDBox p={3} lineHeight={1}>
+                <MDTypography variant="h5" fontWeight="medium">
+                  Interview List
+                </MDTypography>
+                <MDTypography variant="button" color="text">
+                  You can see the candidates selected for the interview below.
+                </MDTypography>
+                <DialogContent>
+                  <DataTable
+                    selectedRows={selectedRows}
+                    updateTableRows={updateTableRows}
+                    data={candidateData}
+                    onArrangeInterviewClick={handleArrangeInterviewClick}
+                    isButtonHidden={true}
+                    table={{
+                      columns: [
+                        { Header: "Candidate", accessor: "name", width: "20%" },
+                        { Header: "Email", accessor: "email", width: "20%" },
+                        { Header: "Phone", accessor: "phone", width: "10%" },
+                        { Header: "Gender", accessor: "gender" },
+                        { Header: "Age", accessor: "age" },
+                        {
+                          Header: "TPPS",
+                          accessor: "tpps",
+                          // eslint-disable-next-line react/no-unstable-nested-components
+                          Cell: ({ value }) => <span>{value}</span>,
+                        },
+                        {
+                          Header: "FYPS",
+                          accessor: "fyps",
+                          // eslint-disable-next-line react/no-unstable-nested-components
+                          Cell: ({ value }) => <span>{value}</span>,
+                        },
+                        {
+                          Header: "Status",
+                          // eslint-disable-next-line react/no-unstable-nested-components
+                          Cell: ({ row }) => <PredictionStatusCell data={row} />,
+                        },
+                      ],
+                      rows: tableRows.slice(0, selectedRows.length),
+                    }}
+                    canSearch
+                    setGlobalFilter={(value) => {}}
+                  />
+                </DialogContent>
+              </MDBox>
             </Card>
           </MDBox>
         </MDBox>

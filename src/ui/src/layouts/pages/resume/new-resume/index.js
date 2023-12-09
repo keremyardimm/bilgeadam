@@ -190,7 +190,7 @@ function NewUser() {
                       {showMessage ? (
                         <MDBox p={2}>
                           <Typography variant="h6" color="success.main">
-                            Kayıt işlemi başarıyla tamamlandı!
+                            Registration completed successfully!
                           </Typography>
                         </MDBox>
                       ) : (

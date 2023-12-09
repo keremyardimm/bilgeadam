@@ -31,6 +31,8 @@ function DataTable({
   isSorted,
   noEndBorder,
   searchInput,
+  onArrangeInterviewClick,
+  isButtonHidden,
 }) {
   const defaultValue = entriesPerPage.defaultValue ? entriesPerPage.defaultValue : 10;
   const entries = entriesPerPage.entries
@@ -178,16 +180,25 @@ function DataTable({
               </MDTypography>
             </MDBox>
           )}
-          {canSearch && (
-            <MDBox width="12rem" ml="auto">
+          {canSearch && !isButtonHidden && (
+            <MDBox width="24rem" ml="auto" display="flex" gap="1rem">
               <MDButton
                 variant="gradient"
                 color="info"
-                fullWidth
+                width="50%"
                 disabled={!selectedRows.length}
                 onClick={handlePredictionsClick}
               >
                 Predictions
+              </MDButton>
+              <MDButton
+                width="50%"
+                variant="gradient"
+                color="info"
+                disabled={!selectedRows.length}
+                onClick={onArrangeInterviewClick}
+              >
+                Arrange an Interview
               </MDButton>
             </MDBox>
           )}
@@ -293,7 +304,7 @@ function DataTable({
 }
 
 DataTable.defaultProps = {
-  entriesPerPage: { defaultValue: 10, entries: [5, 10, 15, 20, 25] },
+  entriesPerPage: { defaultValue: 5, entries: [5, 10, 15, 20, 25] },
   canSearch: false,
   showTotalEntries: true,
   pagination: { variant: "gradient", color: "info" },
