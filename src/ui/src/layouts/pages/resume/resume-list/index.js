@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 // @mui material components
 /* eslint-disable no-debugger */
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Card from "@mui/material/Card";
 
 import MDBox from "components/MDBox";
@@ -14,7 +14,6 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
-import { useAsyncDebounce, setGlobalFilter } from "react-table";
 
 import { useDataContextController, setRemoveResume } from "../../../../context/dataContext";
 
@@ -33,6 +32,8 @@ function DataTables() {
   const [totalResumeCount, setTotalResumeCount] = useState("");
   const [selectedDescription, setSelectedDescription] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
+
   const resumeSummary = ResumeData.reduce((acc, resume) => {
     const key = `${resume.name}_${resume.resumeDescription}`;
     if (!acc[key]) {
@@ -45,6 +46,17 @@ function DataTables() {
   }, {});
 
   const summarizedData = Object.values(resumeSummary);
+
+  const filteredData = useMemo(() => {
+    if (searchInput === "") {
+      return summarizedData;
+    }
+    return summarizedData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+        item.resumeDescription.toLowerCase().includes(searchInput.toLowerCase())
+    );
+  }, [summarizedData, searchInput]);
 
   const onEditClick = (data) => {
     setOpen(true);
@@ -110,10 +122,14 @@ function DataTables() {
                 </MDTypography>
               </MDBox>
               <MDBox p={3}>
-                <MDInput placeholder="Search..." size="small" />
+                <MDInput
+                  placeholder="Search..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                />
               </MDBox>
             </MDBox>
-            <DataTable table={dataTableData} />
+            <DataTable table={{ ...dataTableData, rows: filteredData }} />
           </Card>
         </MDBox>
       </MDBox>
