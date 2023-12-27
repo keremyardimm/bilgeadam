@@ -13,7 +13,6 @@ function PredictionStatusCell({ data }) {
   useEffect(() => {
     const { original } = data;
     const { tpps } = original;
-    console.log(tpps);
 
     if (tpps <= 0.5) {
       setIcon("error");

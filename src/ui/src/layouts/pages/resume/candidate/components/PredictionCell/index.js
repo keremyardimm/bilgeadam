@@ -23,7 +23,7 @@ import MDButton from "components/MDButton";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-function PredictioncCell({ data }) {
+function PredictioncCell({ data, updateTableRows }) {
   const [open, setOpen] = React.useState(false);
   const [trailPeriod, setTrailPeriod] = React.useState(true);
   const [trailPeriod2, setTrailPeriod2] = React.useState(false);
@@ -38,14 +38,44 @@ function PredictioncCell({ data }) {
   };
 
   const handleClose = (isAgree) => {
+    setOpen(false); // İlk olarak dialog penceresini kapat
+
     if (isAgree) {
+      // Eğer "Agree" butonuna basılırsa işlem yapılır
       if (!trailPeriod && !trailPeriod2) {
         alert("Please select one");
         return;
       }
-      navigate("/pages/resume/candidate-trial-period");
+
+      // İşleme alındığında status ve diğer değerleri güncelle
+      const updatedDataInProgress = {
+        ...data.original,
+        status: false,
+        tpps: trailPeriod ? "-" : data.original.tpps,
+        fyps: trailPeriod2 ? "-" : data.original.fyps,
+      };
+
+      // İlk olarak satırı işlemde olarak güncelle
+      updateTableRows((prevRows) =>
+        // eslint-disable-next-line no-underscore-dangle
+        prevRows.map((row) => (row._id === updatedDataInProgress._id ? updatedDataInProgress : row))
+      );
+
+      // 10 saniye sonra gerçek değerlerle güncelle
+      setTimeout(() => {
+        const updatedDataDone = {
+          ...data.original,
+          status: "Done",
+          tpps: trailPeriod ? Math.random().toFixed(2) : data.original.tpps,
+          fyps: trailPeriod2 ? Math.random().toFixed(2) : data.original.fyps,
+        };
+
+        updateTableRows((prevRows) =>
+          // eslint-disable-next-line no-underscore-dangle
+          prevRows.map((row) => (row._id === updatedDataDone._id ? updatedDataDone : row))
+        );
+      }, 10000);
     }
-    setOpen(false);
   };
 
   useEffect(() => {
@@ -118,6 +148,7 @@ function PredictioncCell({ data }) {
 // Typechecking props for the StatusCell
 PredictioncCell.propTypes = {
   data: PropTypes.any.isRequired,
+  updateTableRows: PropTypes.func.isRequired,
 };
 
 export default PredictioncCell;

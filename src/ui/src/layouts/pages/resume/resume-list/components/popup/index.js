@@ -301,7 +301,9 @@ export default function FullScreenDialog(props) {
                       Header: "prediction",
                       accessor: "prediction",
                       // eslint-disable-next-line react/no-unstable-nested-components
-                      Cell: ({ row }) => <PredictionCell data={row} />,
+                      Cell: ({ row }) => (
+                        <PredictionCell data={row} updateTableRows={updateTableRows} />
+                      ),
                     },
                   ],
                   rows: tableRows.slice(0, totalResumeCount),
