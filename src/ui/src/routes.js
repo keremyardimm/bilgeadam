@@ -2,6 +2,7 @@ import Analytics from "layouts/dashboards/analytics";
 
 import NewResume from "layouts/pages/resume/new-resume";
 import ResumeList from "layouts/pages/resume/resume-list";
+import InterviewList from "layouts/pages/resume/interview-list";
 // import CandidateTrialPeriod from "layouts/pages/resume/candidate-trial-period";
 
 import Settings from "layouts/pages/account/settings";
@@ -68,6 +69,12 @@ const routes = [
             key: "position-list",
             route: "/pages/resume/position-list",
             component: <ResumeList />,
+          },
+          {
+            name: "Interview List",
+            key: "interview-list",
+            route: "/pages/resume/interview-list",
+            component: <InterviewList />,
           },
           // {
           //   name: "Candidate Trial Period",

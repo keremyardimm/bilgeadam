@@ -147,6 +147,26 @@ export default function FullScreenDialog(props) {
   const [showInterviewList, setShowInterviewList] = useState(false);
 
   const handleArrangeInterviewClick = () => {
+    // Seçilen adayların tam verilerini bulun
+    // eslint-disable-next-line no-underscore-dangle
+    const selectedCandidates = tableRows.filter((row) => selectedRows.includes(row._id));
+
+    // Her aday için company ve position bilgilerini dahil edin
+    const candidatesWithCompanyAndPosition = selectedCandidates.map((candidate) => ({
+      ...candidate,
+      companyName: props.selectedTitle,
+      positionName: props.selectedDescription,
+    }));
+
+    // localStorage'daki mevcut verileri al
+    const storedCandidates = JSON.parse(localStorage.getItem("selectedCandidates")) || [];
+
+    // Yeni seçilen adayları mevcut verilere ekleyin
+    const updatedCandidates = [...storedCandidates, ...candidatesWithCompanyAndPosition];
+
+    // Güncellenmiş verileri localStorage'a kaydedin
+    localStorage.setItem("selectedCandidates", JSON.stringify(updatedCandidates));
+
     setShowInterviewList(true);
   };
 
