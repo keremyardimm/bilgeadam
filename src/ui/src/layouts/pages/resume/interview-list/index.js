@@ -14,14 +14,9 @@ import Footer from "examples/Footer";
 import DataTable from "examples/Tables/DataTable";
 import PredictionStatusCell from "../candidate/components/PredictionStatusCell";
 
-import { useDataContextController } from "../../../../context/dataContext";
-
 import MDInput from "../../../../components/MDInput";
 
 function DataTables() {
-  const [open, setOpen] = useState(false);
-  const [controller, dispatch] = useDataContextController();
-
   const [searchInput, setSearchInput] = useState("");
 
   const [candidates, setCandidates] = useState([]);
@@ -33,6 +28,16 @@ function DataTables() {
       setCandidates(JSON.parse(storedCandidates));
     }
   }, []);
+
+  // Filtreleme mekanizması
+  const filteredCandidates = useMemo(() => {
+    if (searchInput === "") {
+      return candidates;
+    }
+    return candidates.filter((candidate) =>
+      candidate.companyName.toLowerCase().includes(searchInput.toLowerCase())
+    );
+  }, [candidates, searchInput]);
 
   const columns = React.useMemo(
     () => [
@@ -84,14 +89,7 @@ function DataTables() {
                 />
               </MDBox>
             </MDBox>
-
-            <div>
-              <DataTable
-                data={candidates}
-                table={{ columns, rows: candidates }}
-                canSearch={false}
-              />
-            </div>
+            <DataTable data={filteredCandidates} table={{ columns, rows: filteredCandidates }} />
           </Card>
         </MDBox>
       </MDBox>
